@@ -1,588 +1,546 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#111318">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu Controle Financeiro</title>
-
 <style>
 :root {
-  --bg: #111318;
-  --panel: #1b1e25;
-  --panel2: #232731;
-  --text: #f2f3f5;
-  --muted: #a2a8b5;
-  --border: #343945;
-  --green: #6ed6a0;
-  --blue: #83b5ff;
-  --orange: #f2bd75;
-  --red: #ff8585;
+  --bg:#101114;
+  --panel:#191b20;
+  --panel2:#20232a;
+  --border:#30343d;
+  --text:#f1f2f5;
+  --muted:#9ba1ad;
+  --green:#56d69a;
+  --blue:#72a7ff;
+  --orange:#ffb86b;
+  --red:#ff7272;
+  --purple:#bd9aff;
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
 }
-button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
-header {
-  padding: 25px 18px 18px;
-  border-bottom: 1px solid var(--border);
-  background: #15171d;
+header{
+  padding:22px 5%;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;
 }
-.header-inner, main {
-  width: min(1100px, 100%);
-  margin: auto;
+header h1{font-size:21px;margin:0}
+header span{color:var(--muted);font-size:13px}
+nav{
+  display:flex;gap:8px;padding:14px 5%;overflow-x:auto;
+  border-bottom:1px solid var(--border);
 }
-h1 { margin: 0 0 5px; font-size: 1.65rem; }
-h2 { font-size: 1.2rem; margin: 0 0 16px; }
-h3 { font-size: 1rem; margin: 0 0 10px; }
-p { line-height: 1.5; }
-.subtitle { color: var(--muted); margin: 0; font-size: .92rem; }
-nav {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--border);
-  background: #15171d;
+nav button{
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);padding:10px 15px;border-radius:9px;
+  cursor:pointer;white-space:nowrap;
 }
-nav button {
-  white-space: nowrap;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted);
-  padding: 9px 13px;
-  border-radius: 9px;
+nav button.active{background:var(--panel2);color:var(--text);border-color:#646b79}
+main{max-width:1150px;margin:auto;padding:24px 5% 60px}
+section.page{display:none}
+section.page.active{display:block}
+h2{font-size:22px;margin:0 0 18px}
+h3{font-size:16px;margin:0 0 14px}
+p{color:var(--muted);line-height:1.5}
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:14px;margin-bottom:18px;
 }
-nav button.active {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
-  font-weight: 700;
+.card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:13px;padding:18px;margin-bottom:15px;
 }
-main { padding: 22px 18px 50px; }
-.tab { display: none; }
-.tab.active { display: block; }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 13px;
+.metric-label{font-size:13px;color:var(--muted);margin-bottom:9px}
+.metric{font-size:25px;font-weight:700;overflow-wrap:anywhere}
+.green{color:var(--green)}
+.blue{color:var(--blue)}
+.orange{color:var(--orange)}
+.purple{color:var(--purple)}
+.red{color:var(--red)}
+.small{font-size:12px;color:var(--muted)}
+.bar{
+  height:9px;background:#30343d;border-radius:20px;
+  overflow:hidden;margin:10px 0 7px;
 }
-.two-col {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 15px;
+.bar>div{height:100%;border-radius:20px;transition:width .2s}
+.bar-green{background:var(--green)}
+.bar-blue{background:var(--blue)}
+.bar-orange{background:var(--orange)}
+.bar-purple{background:var(--purple)}
+form{display:grid;gap:12px}
+.form-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
 }
-.card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 17px;
-  min-width: 0;
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+input,select,textarea{
+  width:100%;background:#111318;color:var(--text);
+  border:1px solid var(--border);border-radius:8px;
+  padding:11px;font-size:14px;outline:none;
 }
-.card-label { color: var(--muted); font-size: .88rem; }
-.big-number {
-  font-size: clamp(1.35rem, 3vw, 1.9rem);
-  font-weight: 750;
-  margin: 7px 0;
-  overflow-wrap: anywhere;
+input:focus,select:focus,textarea:focus{border-color:#7588a8}
+textarea{min-height:80px;resize:vertical}
+button.primary,button.secondary,button.danger{
+  border:0;border-radius:8px;padding:11px 15px;
+  cursor:pointer;font-weight:600;
 }
-.green { color: var(--green); }
-.blue { color: var(--blue); }
-.orange { color: var(--orange); }
-.red { color: var(--red); }
-.muted { color: var(--muted); }
-.small { font-size: .85rem; }
-.section { margin-top: 23px; }
-form { margin: 0; }
-.field { margin-bottom: 13px; }
-label {
-  display: block;
-  color: var(--muted);
-  font-size: .88rem;
-  margin-bottom: 6px;
+button.primary{background:var(--green);color:#10251b}
+button.secondary{background:#303640;color:var(--text)}
+button.danger{background:#48272b;color:#ffaaaa}
+button:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:500}
+td{vertical-align:middle}
+.empty{color:var(--muted);text-align:center;padding:22px}
+.transaction-title{font-weight:600}
+.transaction-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.tag{
+  display:inline-block;padding:4px 8px;border-radius:20px;
+  font-size:11px;background:#30343d;color:#d7dbe4;
 }
-input, select, textarea {
-  width: 100%;
-  background: #12141a;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 11px 12px;
-  outline: none;
+.tag.green{background:#18392c}
+.tag.orange{background:#44301c}
+.tag.blue{background:#1c2e49}
+.goal{
+  padding:13px 0;border-bottom:1px solid var(--border);
 }
-input:focus, select:focus, textarea:focus {
-  border-color: var(--blue);
+.goal:last-child{border-bottom:0}
+.goal-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.goal-name{font-weight:600}
+.goal-details{font-size:12px;color:var(--muted);margin-top:5px}
+hr{border:0;border-top:1px solid var(--border);margin:20px 0}
+.notice{
+  padding:12px;border:1px solid var(--border);border-radius:9px;
+  color:var(--muted);font-size:13px;line-height:1.5;
 }
-textarea { min-height: 85px; resize: vertical; }
-button.primary, button.secondary, button.danger {
-  border-radius: 8px;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  font-weight: 650;
+.two-columns{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:15px;
 }
-button.primary { background: var(--text); color: var(--bg); }
-button.secondary { background: var(--panel2); color: var(--text); }
-button.danger { background: transparent; color: var(--red); border-color: #754044; }
-button:disabled { opacity: .45; cursor: not-allowed; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.progress {
-  height: 8px;
-  background: #343945;
-  border-radius: 20px;
-  overflow: hidden;
-  margin: 12px 0 7px;
-}
-.progress > div { height: 100%; background: var(--green); }
-.box-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-.box-line + .box-line {
-  border-top: 1px solid var(--border);
-  margin-top: 12px;
-  padding-top: 12px;
-}
-table { width: 100%; border-collapse: collapse; }
-th, td {
-  text-align: left;
-  padding: 11px 8px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-  font-size: .9rem;
-}
-th { color: var(--muted); font-weight: 600; }
-.table-wrap { overflow-x: auto; }
-.empty { color: var(--muted); padding: 18px 0; }
-.goal-card { margin-bottom: 12px; }
-.goal-meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 9px 0; }
-.tag {
-  font-size: .78rem;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 4px 8px;
-  color: var(--muted);
-}
-.notice {
-  border: 1px solid var(--border);
-  background: #171a21;
-  border-radius: 10px;
-  padding: 12px;
-  color: var(--muted);
-  font-size: .9rem;
-  line-height: 1.5;
-}
-hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
-footer {
-  color: var(--muted);
-  font-size: .8rem;
-  text-align: center;
-  padding: 20px;
-}
-@media (max-width: 700px) {
-  .grid { grid-template-columns: 1fr; }
-  .two-col { grid-template-columns: 1fr; }
-  main { padding: 18px 13px 35px; }
-  header { padding-left: 14px; }
-  nav { padding-left: 13px; }
+@media(max-width:600px){
+  header{padding:18px 5%}
+  main{padding-top:20px}
+  .metric{font-size:22px}
+  th,td{padding:10px 7px}
 }
 </style>
 </head>
-
 <body>
+
 <header>
-  <div class="header-inner">
+  <div>
     <h1>Meu Controle Financeiro</h1>
-    <p class="subtitle">Organize seu dinheiro, acompanhe suas caixas e planeje suas metas.</p>
+    <span>Organização, metas e evolução do patrimônio</span>
   </div>
+  <span id="dataAtual"></span>
 </header>
 
-<nav aria-label="Navegação principal">
-  <button class="active" data-tab="painel">Painel</button>
-  <button data-tab="entradas">Entradas</button>
-  <button data-tab="saidas">Saídas</button>
-  <button data-tab="metas">Metas</button>
-  <button data-tab="configuracoes">Configurações</button>
+<nav>
+  <button class="active" data-page="painel" onclick="irPara('painel')">Painel</button>
+  <button data-page="entradas" onclick="irPara('entradas')">Entradas</button>
+  <button data-page="saidas" onclick="irPara('saidas')">Saídas</button>
+  <button data-page="metas" onclick="irPara('metas')">Metas</button>
+  <button data-page="configuracoes" onclick="irPara('configuracoes')">Configurações</button>
 </nav>
 
 <main>
-  <!-- PAINEL -->
-  <section id="painel" class="tab active">
-    <div class="grid">
-      <div class="card">
-        <div class="card-label">Patrimônio total nas caixas</div>
-        <div class="big-number" id="totalGeral">R$ 0,00</div>
-        <div class="small muted">Soma dos saldos disponíveis</div>
-      </div>
-      <div class="card">
-        <div class="card-label">Total de entradas</div>
-        <div class="big-number green" id="totalEntradas">R$ 0,00</div>
-        <div class="small muted">Entradas registradas</div>
-      </div>
-      <div class="card">
-        <div class="card-label">Total de saídas</div>
-        <div class="big-number orange" id="totalSaidas">R$ 0,00</div>
-        <div class="small muted">Saídas registradas</div>
-      </div>
-    </div>
 
-    <div class="section">
-      <h2>Minhas caixas</h2>
-      <div class="grid">
-        <div class="card">
-          <div class="card-label">Futuro</div>
-          <div class="big-number blue" id="saldoFuturo">R$ 0,00</div>
-          <p class="small muted">Planos de longo prazo e objetivos importantes.</p>
+<!-- PAINEL -->
+<section id="painel" class="page active">
+  <h2>Painel geral</h2>
+
+  <div class="grid">
+    <div class="card">
+      <div class="metric-label">Patrimônio total</div>
+      <div class="metric green" id="patrimonioTotal">R$ 0,00</div>
+      <div class="small">Soma dos três caixas</div>
+    </div>
+    <div class="card">
+      <div class="metric-label">Total de entradas</div>
+      <div class="metric blue" id="totalEntradas">R$ 0,00</div>
+    </div>
+    <div class="card">
+      <div class="metric-label">Total de saídas</div>
+      <div class="metric orange" id="totalSaidas">R$ 0,00</div>
+    </div>
+  </div>
+
+  <h3>Seus caixas</h3>
+  <div class="grid">
+    <div class="card">
+      <div class="metric-label">Futuro</div>
+      <div class="metric blue" id="saldoFuturo">R$ 0,00</div>
+      <div class="small">Investimentos e objetivos futuros</div>
+    </div>
+    <div class="card">
+      <div class="metric-label">Reserva</div>
+      <div class="metric green" id="saldoReserva">R$ 0,00</div>
+      <div class="bar"><div class="bar-green" id="barraReserva"></div></div>
+      <div class="small" id="progressoReserva">R$ 0,00 de R$ 1.250,00</div>
+    </div>
+    <div class="card">
+      <div class="metric-label">Hobbies</div>
+      <div class="metric orange" id="saldoHobbies">R$ 0,00</div>
+      <div class="bar"><div class="bar-orange" id="barraHobbies"></div></div>
+      <div class="small" id="progressoHobbies">R$ 0,00 de R$ 1.250,00</div>
+    </div>
+  </div>
+
+  <div class="two-columns">
+    <div class="card">
+      <h3>Distribuição do patrimônio</h3>
+      <div id="distribuicao"></div>
+    </div>
+    <div class="card">
+      <h3>Próximas metas</h3>
+      <div id="metasPainel"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Movimentações recentes</h3>
+    <div id="movimentacoesRecentes"></div>
+  </div>
+</section>
+
+<!-- ENTRADAS -->
+<section id="entradas" class="page">
+  <h2>Registrar entrada</h2>
+  <div class="card">
+    <form id="formEntrada">
+      <div class="form-grid">
+        <div>
+          <label for="entradaDescricao">Descrição</label>
+          <input id="entradaDescricao" required maxlength="80" placeholder="Ex.: Presente de aniversário">
         </div>
-        <div class="card">
-          <div class="card-label">Reserva</div>
-          <div class="big-number green" id="saldoReserva">R$ 0,00</div>
-          <div class="progress"><div id="barraReserva" style="width:0%"></div></div>
-          <div class="small muted" id="textoReserva">R$ 0,00 de R$ 1.250,00</div>
+        <div>
+          <label for="entradaValor">Valor (R$)</label>
+          <input id="entradaValor" type="number" min="0.01" step="0.01" required placeholder="0,00">
         </div>
-        <div class="card">
-          <div class="card-label">Hobbies</div>
-          <div class="big-number orange" id="saldoHobbies">R$ 0,00</div>
-          <p class="small muted">Jogos, equipamentos, música e outros interesses.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="section two-col">
-      <div class="card">
-        <h2>Distribuição de uma entrada</h2>
-        <div id="resumoDistribuicao"></div>
-        <p class="small muted">A distribuição é calculada automaticamente ao registrar uma entrada.</p>
-      </div>
-      <div class="card">
-        <h2>Próximas metas</h2>
-        <div id="resumoMetas"></div>
-        <button class="secondary" onclick="irPara('metas')">Ver todas as metas</button>
-      </div>
-    </div>
-
-    <div class="section card">
-      <h2>Movimentações recentes</h2>
-      <div id="movimentacoesRecentes"></div>
-    </div>
-  </section>
-
-  <!-- ENTRADAS -->
-  <section id="entradas" class="tab">
-    <div class="two-col">
-      <div class="card">
-        <h2>Registrar entrada</h2>
-        <form id="formEntrada">
-          <div class="field">
-            <label for="entradaDescricao">Descrição</label>
-            <input id="entradaDescricao" maxlength="100" placeholder="Ex.: Presente de aniversário" required>
-          </div>
-          <div class="field">
-            <label for="entradaValor">Valor recebido (R$)</label>
-            <input id="entradaValor" type="number" min="0.01" step="0.01" placeholder="0,00" required>
-          </div>
-          <div class="field">
-            <label for="entradaData">Data</label>
-            <input id="entradaData" type="date" required>
-          </div>
-          <button class="primary" type="submit">Registrar e distribuir</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <h2>Como funciona a distribuição</h2>
-        <p>Enquanto a Reserva ainda não estiver completa, cada entrada segue a divisão normal configurada.</p>
-        <p>Se a parcela normal destinada à Reserva for suficiente para completar o limite, a Reserva recebe somente o que falta. O restante dessa mesma entrada é dividido entre Futuro e Hobbies conforme as porcentagens pós-reserva.</p>
-        <div class="notice" id="regraAtual"></div>
-      </div>
-    </div>
-
-    <div class="section card">
-      <h2>Histórico de entradas</h2>
-      <div class="table-wrap" id="tabelaEntradas"></div>
-    </div>
-  </section>
-
-  <!-- SAÍDAS -->
-  <section id="saidas" class="tab">
-    <div class="two-col">
-      <div class="card">
-        <h2>Registrar saída</h2>
-        <form id="formSaida">
-          <div class="field">
-            <label for="saidaDescricao">Descrição da compra</label>
-            <input id="saidaDescricao" maxlength="100" placeholder="Ex.: Jogo usado de PS3" required>
-          </div>
-          <div class="field">
-            <label for="saidaValor">Valor gasto (R$)</label>
-            <input id="saidaValor" type="number" min="0.01" step="0.01" placeholder="0,00" required>
-          </div>
-          <div class="field">
-            <label for="saidaCaixa">Caixa utilizada</label>
-            <select id="saidaCaixa" required>
-              <option value="hobbies">Hobbies</option>
-              <option value="futuro">Futuro</option>
-              <option value="reserva">Reserva</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="saidaData">Data</label>
-            <input id="saidaData" type="date" required>
-          </div>
-          <button class="primary" type="submit">Registrar saída</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <h2>Saldos disponíveis</h2>
-        <div id="saldosParaSaida"></div>
-        <hr>
-        <div class="notice">Uma saída é descontada exclusivamente da caixa escolhida. O sistema não permite gastar mais do que existe nela e não altera as outras caixas.</div>
-      </div>
-    </div>
-
-    <div class="section card">
-      <h2>Histórico de saídas</h2>
-      <div class="table-wrap" id="tabelaSaidas"></div>
-    </div>
-  </section>
-
-  <!-- METAS -->
-  <section id="metas" class="tab">
-    <div class="two-col">
-      <div class="card">
-        <h2>Adicionar meta</h2>
-        <form id="formMeta">
-          <div class="field">
-            <label for="metaNome">Nome da meta</label>
-            <input id="metaNome" maxlength="100" placeholder="Ex.: Comprar uma guitarra" required>
-          </div>
-          <div class="field">
-            <label for="metaCategoria">Categoria</label>
-            <select id="metaCategoria">
-              <option value="Hobby">Hobby</option>
-              <option value="Importante">Importante</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="metaCusto">Custo estimado (R$)</label>
-            <input id="metaCusto" type="number" min="0.01" step="0.01" required>
-          </div>
-          <div class="field">
-            <label for="metaGuardado">Valor já reservado para essa meta (R$)</label>
-            <input id="metaGuardado" type="number" min="0" step="0.01" value="0" required>
-          </div>
-          <div class="field">
-            <label for="metaPrioridade">Prioridade</label>
-            <select id="metaPrioridade">
-              <option value="Alta">Alta</option>
-              <option value="Média" selected>Média</option>
-              <option value="Baixa">Baixa</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="metaPrazo">Prazo desejado (opcional)</label>
-            <input id="metaPrazo" type="date">
-          </div>
-          <div class="field">
-            <label for="metaNotas">Observações (opcional)</label>
-            <textarea id="metaNotas" maxlength="1000" placeholder="Detalhes, modelo desejado, alternativas..."></textarea>
-          </div>
-          <button class="primary" type="submit">Adicionar meta</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <h2>Planejamento de metas</h2>
-        <div id="resumoPlanejamento"></div>
-        <hr>
-        <div class="notice">
-          Metas são apenas planejamento: o valor reservado informado aqui não é somado ao patrimônio nem descontado de uma caixa. Quando comprar algo, registre a compra em Saídas. Atualize o valor reservado da meta manualmente para manter seu planejamento em dia.
+        <div>
+          <label for="entradaData">Data</label>
+          <input id="entradaData" type="date" required>
         </div>
       </div>
-    </div>
+      <button class="primary" type="submit">Adicionar entrada</button>
+    </form>
+  </div>
 
-    <div class="section">
-      <h2>Minhas metas</h2>
-      <div id="listaMetas"></div>
-    </div>
-  </section>
+  <div class="card">
+    <h3>Histórico de entradas</h3>
+    <div id="historicoEntradas" class="table-wrap"></div>
+  </div>
+</section>
 
-  <!-- CONFIGURAÇÕES -->
-  <section id="configuracoes" class="tab">
-    <div class="two-col">
-      <div class="card">
-        <h2>Regras de distribuição</h2>
-        <form id="formConfiguracoes">
-          <h3>Enquanto a Reserva não estiver completa</h3>
-          <div class="field">
-            <label for="pFuturo">Futuro (%)</label>
-            <input id="pFuturo" type="number" min="0" max="100" step="0.01" required>
-          </div>
-          <div class="field">
-            <label for="pReserva">Reserva (%)</label>
-            <input id="pReserva" type="number" min="0" max="100" step="0.01" required>
-          </div>
-          <div class="field">
-            <label for="pHobbies">Hobbies (%)</label>
-            <input id="pHobbies" type="number" min="0" max="100" step="0.01" required>
-          </div>
-
-          <hr>
-          <h3>Depois que a Reserva estiver completa</h3>
-          <div class="field">
-            <label for="pFuturoDepois">Futuro (%)</label>
-            <input id="pFuturoDepois" type="number" min="0" max="100" step="0.01" required>
-          </div>
-          <div class="field">
-            <label for="pHobbiesDepois">Hobbies (%)</label>
-            <input id="pHobbiesDepois" type="number" min="0" max="100" step="0.01" required>
-          </div>
-
-          <div class="field">
-            <label for="limiteReserva">Limite da Reserva (R$)</label>
-            <input id="limiteReserva" type="number" min="0" step="0.01" required>
-          </div>
-          <button class="primary" type="submit">Salvar configurações</button>
-          <p class="small muted">As porcentagens devem somar 100% em cada fase.</p>
-        </form>
-      </div>
-
-      <div class="card">
-        <h2>Saldo inicial</h2>
-        <p class="small muted">Use isso para começar com dinheiro que você já possui. Esta operação substitui os saldos atuais e zera o histórico de movimentações. Faça um backup antes, se necessário.</p>
-        <form id="formSaldoInicial">
-          <div class="field">
-            <label for="inicialFuturo">Saldo inicial de Futuro (R$)</label>
-            <input id="inicialFuturo" type="number" min="0" step="0.01" value="0" required>
-          </div>
-          <div class="field">
-            <label for="inicialReserva">Saldo inicial de Reserva (R$)</label>
-            <input id="inicialReserva" type="number" min="0" step="0.01" value="0" required>
-          </div>
-          <div class="field">
-            <label for="inicialHobbies">Saldo inicial de Hobbies (R$)</label>
-            <input id="inicialHobbies" type="number" min="0" step="0.01" value="0" required>
-          </div>
-          <button class="secondary" type="submit">Definir saldos iniciais</button>
-        </form>
-
-        <hr>
-        <h2>Backup dos dados</h2>
-        <p class="small muted">Exporte um arquivo JSON para guardar uma cópia. Você pode importar esse arquivo depois, inclusive em outro navegador.</p>
-        <div class="actions">
-          <button class="secondary" id="exportarBackup" type="button">Exportar backup</button>
-          <button class="secondary" id="escolherImportacao" type="button">Importar backup</button>
-          <input id="arquivoImportacao" type="file" accept=".json,application/json" hidden>
+<!-- SAÍDAS -->
+<section id="saidas" class="page">
+  <h2>Registrar saída</h2>
+  <div class="card">
+    <form id="formSaida">
+      <div class="form-grid">
+        <div>
+          <label for="saidaDescricao">Descrição</label>
+          <input id="saidaDescricao" required maxlength="80" placeholder="Ex.: Compra de um jogo">
         </div>
-        <hr>
-        <h2>Apagar dados</h2>
-        <p class="small muted">Apaga os dados financeiros salvos neste navegador.</p>
-        <button class="danger" id="apagarDados" type="button">Apagar tudo</button>
+        <div>
+          <label for="saidaValor">Valor (R$)</label>
+          <input id="saidaValor" type="number" min="0.01" step="0.01" required placeholder="0,00">
+        </div>
+        <div>
+          <label for="saidaCaixa">Caixa</label>
+          <select id="saidaCaixa" required>
+            <option value="hobbies">Hobbies</option>
+            <option value="reserva">Reserva</option>
+            <option value="futuro">Futuro</option>
+          </select>
+        </div>
+        <div>
+          <label for="saidaData">Data</label>
+          <input id="saidaData" type="date" required>
+        </div>
       </div>
-    </div>
+      <button class="primary" type="submit">Registrar saída</button>
+    </form>
+  </div>
 
-    <div class="section notice">
-      <strong>Importante:</strong> os dados ficam salvos no armazenamento local deste navegador. Limpar os dados do navegador ou usar outro aparelho pode fazer com que eles não apareçam. Exporte backups regularmente.
+  <div class="card">
+    <h3>Histórico de saídas</h3>
+    <div id="historicoSaidas" class="table-wrap"></div>
+  </div>
+</section>
+
+<!-- METAS -->
+<section id="metas" class="page">
+  <h2>Metas e objetivos</h2>
+  <div class="card">
+    <form id="formMeta">
+      <div class="form-grid">
+        <div>
+          <label for="metaNome">Nome da meta</label>
+          <input id="metaNome" required maxlength="80" placeholder="Ex.: Comprar uma guitarra">
+        </div>
+        <div>
+          <label for="metaTipo">Categoria</label>
+          <select id="metaTipo">
+            <option value="hobby">Hobby</option>
+            <option value="importante">Importante</option>
+          </select>
+        </div>
+        <div>
+          <label for="metaCusto">Custo estimado (R$)</label>
+          <input id="metaCusto" type="number" min="0" step="0.01" required placeholder="0,00">
+        </div>
+        <div>
+          <label for="metaReservado">Valor já reservado para a meta (R$)</label>
+          <input id="metaReservado" type="number" min="0" step="0.01" value="0">
+        </div>
+        <div>
+          <label for="metaPrioridade">Prioridade</label>
+          <select id="metaPrioridade">
+            <option value="alta">Alta</option>
+            <option value="media" selected>Média</option>
+            <option value="baixa">Baixa</option>
+          </select>
+        </div>
+        <div>
+          <label for="metaPrazo">Prazo (opcional)</label>
+          <input id="metaPrazo" type="date">
+        </div>
+      </div>
+      <div>
+        <label for="metaNotas">Observações</label>
+        <textarea id="metaNotas" maxlength="500" placeholder="Detalhes da meta..."></textarea>
+      </div>
+      <button class="primary" type="submit">Adicionar meta</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Suas metas</h3>
+    <div id="listaMetas"></div>
+  </div>
+  <div class="notice">
+    O valor reservado nas metas é apenas um planejamento. Ele não altera automaticamente o saldo dos seus caixas.
+  </div>
+</section>
+
+<!-- CONFIGURAÇÕES -->
+<section id="configuracoes" class="page">
+  <h2>Configurações</h2>
+
+  <div class="card">
+    <h3>Distribuição das entradas</h3>
+    <p>Defina como o dinheiro será distribuído enquanto a Reserva ainda não atingiu o limite e depois que ela estiver completa.</p>
+
+    <form id="formPercentuais">
+      <h3>Enquanto a Reserva não estiver completa</h3>
+      <div class="form-grid">
+        <div>
+          <label for="pctFuturoAntes">Futuro (%)</label>
+          <input id="pctFuturoAntes" type="number" min="0" max="100" step="1">
+        </div>
+        <div>
+          <label for="pctReservaAntes">Reserva (%)</label>
+          <input id="pctReservaAntes" type="number" min="0" max="100" step="1">
+        </div>
+        <div>
+          <label for="pctHobbiesAntes">Hobbies (%)</label>
+          <input id="pctHobbiesAntes" type="number" min="0" max="100" step="1">
+        </div>
+      </div>
+
+      <hr>
+      <h3>Depois que a Reserva estiver completa</h3>
+      <div class="form-grid">
+        <div>
+          <label for="pctFuturoDepois">Futuro (%)</label>
+          <input id="pctFuturoDepois" type="number" min="0" max="100" step="1">
+        </div>
+        <div>
+          <label for="pctHobbiesDepois">Hobbies (%)</label>
+          <input id="pctHobbiesDepois" type="number" min="0" max="100" step="1">
+        </div>
+      </div>
+      <button class="primary" type="submit">Salvar percentuais</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Limites dos caixas</h3>
+    <p>Quando um caixa atingir seu limite, a parte que iria para ele será direcionada ao Futuro.</p>
+    <form id="formLimites">
+      <div class="form-grid">
+        <div>
+          <label for="limiteReserva">Limite da Reserva (R$)</label>
+          <input id="limiteReserva" type="number" min="0" step="0.01" required>
+        </div>
+        <div>
+          <label for="limiteHobbies">Limite dos Hobbies (R$)</label>
+          <input id="limiteHobbies" type="number" min="0" step="0.01" required>
+        </div>
+      </div>
+      <button class="primary" type="submit">Salvar limites</button>
+    </form>
+    <p class="small">Diminuir um limite não apaga dinheiro que já esteja no caixa. O novo limite afeta somente as próximas entradas.</p>
+  </div>
+
+  <div class="card">
+    <h3>Saldos iniciais</h3>
+    <p>Use esta opção para informar quanto dinheiro você já possui em cada caixa. Isso substitui os saldos atuais e limpa o histórico de entradas e saídas, mas mantém suas metas e configurações.</p>
+    <form id="formSaldos">
+      <div class="form-grid">
+        <div>
+          <label for="inicialFuturo">Futuro (R$)</label>
+          <input id="inicialFuturo" type="number" min="0" step="0.01" required>
+        </div>
+        <div>
+          <label for="inicialReserva">Reserva (R$)</label>
+          <input id="inicialReserva" type="number" min="0" step="0.01" required>
+        </div>
+        <div>
+          <label for="inicialHobbies">Hobbies (R$)</label>
+          <input id="inicialHobbies" type="number" min="0" step="0.01" required>
+        </div>
+      </div>
+      <button class="primary" type="submit">Atualizar saldos iniciais</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Backup dos dados</h3>
+    <p>Exporte seus dados para um arquivo JSON ou importe um backup anterior.</p>
+    <div class="actions">
+      <button class="secondary" onclick="exportarBackup()">Exportar backup</button>
+      <button class="secondary" onclick="document.getElementById('arquivoBackup').click()">Importar backup</button>
+      <input id="arquivoBackup" type="file" accept=".json,application/json" hidden onchange="importarBackup(event)">
     </div>
-  </section>
+  </div>
+
+  <div class="card">
+    <h3>Apagar todos os dados</h3>
+    <p>Remove saldos, históricos, metas e configurações personalizadas.</p>
+    <button class="danger" onclick="limparTudo()">Apagar tudo</button>
+  </div>
+</section>
+
 </main>
-
-<footer>Controle financeiro pessoal · Seus dados ficam neste navegador</footer>
 
 <script>
 "use strict";
 
 const CHAVE_DADOS = "meuControleFinanceiro_v1";
 
-const CONFIG_PADRAO = {
-  pFuturo: 60,
-  pReserva: 25,
-  pHobbies: 15,
-  pFuturoDepois: 85,
-  pHobbiesDepois: 15,
-  limiteReserva: 1250
+const PADRAO = {
+  saldos: {
+    futuro: 0,
+    reserva: 0,
+    hobbies: 0
+  },
+  limites: {
+    reserva: 125000,
+    hobbies: 125000
+  },
+  percentuais: {
+    antes: {
+      futuro: 60,
+      reserva: 25,
+      hobbies: 15
+    },
+    depois: {
+      futuro: 85,
+      hobbies: 15
+    }
+  },
+  entradas: [],
+  saidas: [],
+  metas: []
 };
 
-function estadoInicial() {
-  return {
-    versao: 1,
-    configuracoes: { ...CONFIG_PADRAO },
-    saldos: { futuro: 0, reserva: 0, hobbies: 0 },
-    entradas: [],
-    saidas: [],
-    metas: []
-  };
-}
-
 let dados = carregarDados();
+
+function clonar(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
 
 function carregarDados() {
   try {
     const salvo = localStorage.getItem(CHAVE_DADOS);
-    if (!salvo) return estadoInicial();
+    if (!salvo) return clonar(PADRAO);
 
-    const obj = JSON.parse(salvo);
-    if (!obj || typeof obj !== "object") return estadoInicial();
+    const antigo = JSON.parse(salvo);
+    const base = clonar(PADRAO);
 
-    const base = estadoInicial();
-    return {
+    const resultado = {
       ...base,
-      ...obj,
-      configuracoes: { ...CONFIG_PADRAO, ...(obj.configuracoes || {}) },
-      saldos: { ...base.saldos, ...(obj.saldos || {}) },
-      entradas: Array.isArray(obj.entradas) ? obj.entradas : [],
-      saidas: Array.isArray(obj.saidas) ? obj.saidas : [],
-      metas: Array.isArray(obj.metas) ? obj.metas : []
+      ...antigo,
+      saldos: {
+        ...base.saldos,
+        ...(antigo.saldos || {})
+      },
+      limites: {
+        ...base.limites,
+        ...(antigo.limites || {})
+      },
+      percentuais: {
+        antes: {
+          ...base.percentuais.antes,
+          ...(antigo.percentuais?.antes || {})
+        },
+        depois: {
+          ...base.percentuais.depois,
+          ...(antigo.percentuais?.depois || {})
+        }
+      },
+      entradas: Array.isArray(antigo.entradas) ? antigo.entradas : [],
+      saidas: Array.isArray(antigo.saidas) ? antigo.saidas : [],
+      metas: Array.isArray(antigo.metas) ? antigo.metas : []
     };
-  } catch (erro) {
-    alert("Não foi possível ler os dados salvos. Será iniciado um controle vazio.");
-    return estadoInicial();
+
+    // Compatibilidade com versões antigas que guardavam o limite
+    // da Reserva em outro campo.
+    if (antigo.limiteReserva !== undefined &&
+        antigo.limites?.reserva === undefined) {
+      resultado.limites.reserva = paraCentavos(antigo.limiteReserva);
+    }
+
+    if (antigo.limiteHobbies !== undefined &&
+        antigo.limites?.hobbies === undefined) {
+      resultado.limites.hobbies = paraCentavos(antigo.limiteHobbies);
+    }
+
+    return resultado;
+  } catch (e) {
+    alert("Não foi possível ler os dados salvos. Um novo controle será iniciado.");
+    return clonar(PADRAO);
   }
 }
 
-function salvarDados() {
-  try {
-    localStorage.setItem(CHAVE_DADOS, JSON.stringify(dados));
-  } catch (erro) {
-    alert("Não foi possível salvar os dados neste navegador. Exporte um backup e verifique o espaço disponível.");
-  }
+function salvar() {
+  localStorage.setItem(CHAVE_DADOS, JSON.stringify(dados));
 }
 
-function dinheiro(valor) {
-  return (Number(valor) || 0).toLocaleString("pt-BR", {
+function paraCentavos(valor) {
+  const numero = Number(valor);
+  if (!Number.isFinite(numero)) return 0;
+  return Math.round(numero * 100);
+}
+
+function reais(centavos) {
+  return (Number(centavos || 0) / 100).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL"
   });
 }
 
-function centavos(valor) {
-  return Math.round((Number(valor) + Number.EPSILON) * 100);
-}
-
-function deCentavos(valor) {
-  return valor / 100;
-}
-
 function valorInput(id) {
-  return Number(document.getElementById(id).value);
-}
-
-function escapar(texto) {
-  return String(texto ?? "").replace(/[&<>"']/g, caractere => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[caractere]);
+  return paraCentavos(document.getElementById(id).value);
 }
 
 function dataHoje() {
@@ -593,636 +551,744 @@ function dataHoje() {
   return `${ano}-${mes}-${dia}`;
 }
 
-function dataBonita(data) {
-  if (!data) return "Sem prazo";
+function escapar(texto) {
+  return String(texto ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[c]);
+}
+
+function porcentagem(valor, total) {
+  if (!total) return 0;
+  return Math.max(0, Math.min(100, valor / total * 100));
+}
+
+function formatarData(data) {
+  if (!data) return "Sem data";
   const partes = data.split("-");
   if (partes.length !== 3) return data;
   return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
-function nomeCaixa(caixa) {
-  return {
-    futuro: "Futuro",
-    reserva: "Reserva",
-    hobbies: "Hobbies"
-  }[caixa] || caixa;
-}
-
-function totalSaldos() {
-  return dados.saldos.futuro + dados.saldos.reserva + dados.saldos.hobbies;
-}
-
-function totalEntradas() {
-  return dados.entradas.reduce((soma, item) => soma + Number(item.valor || 0), 0);
-}
-
-function totalSaidas() {
-  return dados.saidas.reduce((soma, item) => soma + Number(item.valor || 0), 0);
-}
-
-function formatarPorcentagem(valor) {
-  return Number(valor).toLocaleString("pt-BR", { maximumFractionDigits: 2 }) + "%";
+function gerarId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
 function irPara(id) {
-  document.querySelectorAll(".tab").forEach(secao => secao.classList.remove("active"));
-  document.querySelectorAll("nav button").forEach(botao => botao.classList.remove("active"));
+  document.querySelectorAll("section.page").forEach(sec => {
+    sec.classList.toggle("active", sec.id === id);
+  });
 
-  const secao = document.getElementById(id);
-  const botao = document.querySelector(`nav button[data-tab="${id}"]`);
+  document.querySelectorAll("nav button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.page === id);
+  });
 
-  if (secao) secao.classList.add("active");
-  if (botao) botao.classList.add("active");
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (id === "configuracoes") preencherConfiguracoes();
+  renderizar();
 }
 
-document.querySelectorAll("nav button[data-tab]").forEach(botao => {
-  botao.addEventListener("click", () => irPara(botao.dataset.tab));
-});
+function totalPatrimonio() {
+  return dados.saldos.futuro +
+         dados.saldos.reserva +
+         dados.saldos.hobbies;
+}
 
 /*
- * Distribuição:
- * - Se a parcela normal da Reserva for menor que o valor que falta,
- *   usa a divisão normal.
- * - Se essa parcela puder completar a Reserva, a Reserva recebe apenas
- *   o que falta; o restante da mesma entrada é dividido na regra pós-reserva.
- * - Se a Reserva já estiver completa, toda a entrada segue a regra pós-reserva.
- * Os cálculos são feitos em centavos para evitar erros de arredondamento.
- */
+  Distribuição de uma entrada:
+  - Reserva recebe sua porcentagem até atingir o limite.
+  - Hobbies recebe sua porcentagem até atingir o limite.
+  - O que ultrapassar os limites vai para Futuro.
+  - Se a Reserva completar no meio da entrada, o restante usa
+    os percentuais da fase posterior à Reserva.
+  - A soma final sempre corresponde exatamente à entrada.
+*/
+
 function distribuirEntrada(valor) {
-  const cfg = dados.configuracoes;
-  const valorCentavos = centavos(valor);
-  const saldoReservaCentavos = centavos(dados.saldos.reserva);
-  const limiteCentavos = centavos(cfg.limiteReserva);
-  const faltaReserva = Math.max(0, limiteCentavos - saldoReservaCentavos);
+  let restante = valor;
 
-  const parcelaReservaNormal = Math.round(valorCentavos * cfg.pReserva / 100);
-
-  let distribuicao = { futuro: 0, reserva: 0, hobbies: 0 };
-
-  if (faltaReserva > 0 && parcelaReservaNormal < faltaReserva) {
-    // A parcela normal não completa a Reserva: regra normal.
-    distribuicao.futuro = Math.round(valorCentavos * cfg.pFuturo / 100);
-    distribuicao.reserva = parcelaReservaNormal;
-    distribuicao.hobbies = valorCentavos - distribuicao.futuro - distribuicao.reserva;
-  } else {
-    // Completa a Reserva com apenas o necessário e divide o resto.
-    distribuicao.reserva = Math.min(faltaReserva, valorCentavos);
-    const restante = valorCentavos - distribuicao.reserva;
-
-    distribuicao.futuro = Math.round(restante * cfg.pFuturoDepois / 100);
-    distribuicao.hobbies = restante - distribuicao.futuro;
-  }
-
-  // Garante que a soma das parcelas seja exatamente o valor da entrada.
-  const soma = distribuicao.futuro + distribuicao.reserva + distribuicao.hobbies;
-  distribuicao.hobbies += valorCentavos - soma;
-
-  return {
-    futuro: deCentavos(distribuicao.futuro),
-    reserva: deCentavos(distribuicao.reserva),
-    hobbies: deCentavos(distribuicao.hobbies)
+  const alocacao = {
+    futuro: 0,
+    reserva: 0,
+    hobbies: 0
   };
-}
 
-function renderizarTudo() {
-  renderizarPainel();
-  renderizarEntradas();
-  renderizarSaidas();
-  renderizarMetas();
-  preencherConfiguracoes();
-}
+  const saldoReserva = dados.saldos.reserva;
+  const saldoHobbies = dados.saldos.hobbies;
 
-function renderizarPainel() {
-  document.getElementById("totalGeral").textContent = dinheiro(totalSaldos());
-  document.getElementById("totalEntradas").textContent = dinheiro(totalEntradas());
-  document.getElementById("totalSaidas").textContent = dinheiro(totalSaidas());
+  const limiteReserva = Math.max(0, dados.limites.reserva);
+  const limiteHobbies = Math.max(0, dados.limites.hobbies);
 
-  document.getElementById("saldoFuturo").textContent = dinheiro(dados.saldos.futuro);
-  document.getElementById("saldoReserva").textContent = dinheiro(dados.saldos.reserva);
-  document.getElementById("saldoHobbies").textContent = dinheiro(dados.saldos.hobbies);
+  const reservaCheia = saldoReserva >= limiteReserva;
 
-  const limite = Number(dados.configuracoes.limiteReserva);
-  const saldoReserva = Number(dados.saldos.reserva);
-  const percentual = limite > 0 ? Math.min(100, saldoReserva / limite * 100) : 100;
+  if (!reservaCheia && restante > 0) {
+    const p = dados.percentuais.antes;
+    const parteReserva = Math.floor(valor * p.reserva / 100);
+    const faltaReserva = Math.max(0, limiteReserva - saldoReserva);
 
-  document.getElementById("barraReserva").style.width = `${percentual}%`;
-  document.getElementById("textoReserva").textContent =
-    `${dinheiro(saldoReserva)} de ${dinheiro(limite)} · ${percentual.toFixed(1).replace(".", ",")}%`;
+    if (parteReserva < faltaReserva) {
+      const futuroBase = Math.floor(valor * p.futuro / 100);
+      const reservaBase = parteReserva;
+      const hobbiesBase = valor - futuroBase - reservaBase;
 
-  const cfg = dados.configuracoes;
-  const reservaCompleta = saldoReserva >= limite;
+      const podeReserva = Math.min(
+        reservaBase,
+        Math.max(0, limiteReserva - saldoReserva)
+      );
 
-  document.getElementById("resumoDistribuicao").innerHTML = reservaCompleta
-    ? `
-      <div class="box-line"><span>Futuro</span><strong class="blue">${formatarPorcentagem(cfg.pFuturoDepois)}</strong></div>
-      <div class="box-line"><span>Reserva</span><strong>0%</strong></div>
-      <div class="box-line"><span>Hobbies</span><strong class="orange">${formatarPorcentagem(cfg.pHobbiesDepois)}</strong></div>
-      <p class="small muted">A Reserva já atingiu seu limite.</p>
-    `
-    : `
-      <div class="box-line"><span>Futuro</span><strong class="blue">${formatarPorcentagem(cfg.pFuturo)}</strong></div>
-      <div class="box-line"><span>Reserva</span><strong class="green">${formatarPorcentagem(cfg.pReserva)}</strong></div>
-      <div class="box-line"><span>Hobbies</span><strong class="orange">${formatarPorcentagem(cfg.pHobbies)}</strong></div>
-      <p class="small muted">Se a parcela da Reserva completar o limite, o excedente da mesma entrada passa para a regra pós-reserva.</p>
-    `;
+      const podeHobbies = Math.min(
+        hobbiesBase,
+        Math.max(0, limiteHobbies - saldoHobbies)
+      );
 
-  const metasAbertas = dados.metas
-    .filter(meta => Number(meta.custo) > Number(meta.guardado))
-    .sort((a, b) => prioridadeNumero(a.prioridade) - prioridadeNumero(b.prioridade))
-    .slice(0, 3);
+      alocacao.reserva += podeReserva;
+      alocacao.hobbies += podeHobbies;
 
-  document.getElementById("resumoMetas").innerHTML = metasAbertas.length
-    ? metasAbertas.map(meta => `
-      <div class="box-line">
-        <div>
-          <strong>${escapar(meta.nome)}</strong>
-          <div class="small muted">${escapar(meta.categoria)} · Falta ${dinheiro(Math.max(0, meta.custo - meta.guardado))}</div>
-        </div>
-        <span class="tag">${escapar(meta.prioridade)}</span>
-      </div>
-    `).join("")
-    : '<p class="empty">Nenhuma meta pendente. Você pode adicionar uma na aba Metas.</p>';
-
-  const movimentos = [
-    ...dados.entradas.map(item => ({ ...item, tipo: "Entrada" })),
-    ...dados.saidas.map(item => ({ ...item, tipo: "Saída" }))
-  ].sort((a, b) => String(b.criadoEm || b.data).localeCompare(String(a.criadoEm || a.data))).slice(0, 6);
-
-  document.getElementById("movimentacoesRecentes").innerHTML = movimentos.length
-    ? `<div class="table-wrap"><table>
-        <thead><tr><th>Data</th><th>Movimentação</th><th>Valor</th></tr></thead>
-        <tbody>${movimentos.map(item => `
-          <tr>
-            <td>${dataBonita(item.data)}</td>
-            <td>${escapar(item.descricao)}<div class="small muted">${item.tipo}${item.caixa ? " · " + nomeCaixa(item.caixa) : ""}</div></td>
-            <td class="${item.tipo === "Entrada" ? "green" : "orange"}">${item.tipo === "Entrada" ? "+" : "−"}${dinheiro(item.valor)}</td>
-          </tr>`).join("")}
-        </tbody>
-      </table></div>`
-    : '<p class="empty">Ainda não há movimentações registradas.</p>';
-}
-
-function tabelaHistorico(lista, tipo) {
-  if (!lista.length) return '<p class="empty">Nenhuma movimentação registrada.</p>';
-
-  return `<table>
-    <thead><tr><th>Data</th><th>Descrição</th>${tipo === "entrada" ? "<th>Distribuição</th>" : "<th>Caixa</th>"}<th>Valor</th><th></th></tr></thead>
-    <tbody>
-    ${[...lista].reverse().map(item => `
-      <tr>
-        <td>${dataBonita(item.data)}</td>
-        <td>${escapar(item.descricao)}</td>
-        ${tipo === "entrada"
-          ? `<td class="small">
-              Futuro: ${dinheiro(item.distribuicao.futuro)}<br>
-              Reserva: ${dinheiro(item.distribuicao.reserva)}<br>
-              Hobbies: ${dinheiro(item.distribuicao.hobbies)}
-            </td>`
-          : `<td>${nomeCaixa(item.caixa)}</td>`}
-        <td>${dinheiro(item.valor)}</td>
-        <td><button class="danger small" onclick="excluirMovimentacao('${tipo}','${item.id}')">Excluir</button></td>
-      </tr>`).join("")}
-    </tbody>
-  </table>`;
-}
-
-function renderizarEntradas() {
-  document.getElementById("tabelaEntradas").innerHTML = tabelaHistorico(dados.entradas, "entrada");
-
-  const cfg = dados.configuracoes;
-  document.getElementById("regraAtual").innerHTML = `
-    <strong>Regra normal:</strong> Futuro ${formatarPorcentagem(cfg.pFuturo)},
-    Reserva ${formatarPorcentagem(cfg.pReserva)} e Hobbies ${formatarPorcentagem(cfg.pHobbies)}.<br><br>
-    <strong>Após completar a Reserva:</strong> Futuro ${formatarPorcentagem(cfg.pFuturoDepois)}
-    e Hobbies ${formatarPorcentagem(cfg.pHobbiesDepois)}.
-  `;
-}
-
-function renderizarSaidas() {
-  document.getElementById("tabelaSaidas").innerHTML = tabelaHistorico(dados.saidas, "saida");
-
-  document.getElementById("saldosParaSaida").innerHTML = `
-    <div class="box-line"><span>Futuro</span><strong>${dinheiro(dados.saldos.futuro)}</strong></div>
-    <div class="box-line"><span>Reserva</span><strong>${dinheiro(dados.saldos.reserva)}</strong></div>
-    <div class="box-line"><span>Hobbies</span><strong>${dinheiro(dados.saldos.hobbies)}</strong></div>
-  `;
-}
-
-function excluirMovimentacao(tipo, id) {
-  const lista = tipo === "entrada" ? dados.entradas : dados.saidas;
-  const item = lista.find(mov => mov.id === id);
-  if (!item) return;
-
-  const mensagem = tipo === "entrada"
-    ? "Excluir esta entrada também vai desfazer sua distribuição nas três caixas. Continuar?"
-    : "Excluir esta saída vai devolver o valor à caixa utilizada. Continuar?";
-
-  if (!confirm(mensagem)) return;
-
-  if (tipo === "entrada") {
-    dados.saldos.futuro -= item.distribuicao.futuro;
-    dados.saldos.reserva -= item.distribuicao.reserva;
-    dados.saldos.hobbies -= item.distribuicao.hobbies;
-    dados.entradas = dados.entradas.filter(mov => mov.id !== id);
-  } else {
-    dados.saldos[item.caixa] += item.valor;
-    dados.saidas = dados.saidas.filter(mov => mov.id !== id);
+      // Tudo que não couber nos caixas limitados vai para Futuro.
+      alocacao.futuro += valor - podeReserva - podeHobbies;
+      restante = 0;
+    } else {
+      // Reserva completa durante esta entrada.
+      alocacao.reserva += faltaReserva;
+      restante -= faltaReserva;
+    }
   }
 
-  // Corrige possíveis resíduos de ponto flutuante.
-  for (const caixa of Object.keys(dados.saldos)) {
-    dados.saldos[caixa] = Math.max(0, deCentavos(centavos(dados.saldos[caixa])));
+  if (restante > 0) {
+    const p = dados.percentuais.depois;
+    const parteHobbies = Math.floor(restante * p.hobbies / 100);
+    const parteFuturo = restante - parteHobbies;
+
+    const podeHobbies = Math.min(
+      parteHobbies,
+      Math.max(0, limiteHobbies - (saldoHobbies + alocacao.hobbies))
+    );
+
+    alocacao.hobbies += podeHobbies;
+
+    // A parte de Hobbies que ultrapassar o limite também vai para Futuro.
+    alocacao.futuro += parteFuturo + (parteHobbies - podeHobbies);
   }
 
-  salvarDados();
-  renderizarTudo();
+  // Proteção contra diferenças de arredondamento.
+  const soma = alocacao.futuro + alocacao.reserva + alocacao.hobbies;
+  alocacao.futuro += valor - soma;
+
+  return alocacao;
 }
 
-document.getElementById("formEntrada").addEventListener("submit", evento => {
-  evento.preventDefault();
+document.getElementById("formEntrada").addEventListener("submit", e => {
+  e.preventDefault();
 
   const descricao = document.getElementById("entradaDescricao").value.trim();
   const valor = valorInput("entradaValor");
   const data = document.getElementById("entradaData").value;
 
-  if (!descricao || !Number.isFinite(valor) || valor <= 0 || !data) {
-    alert("Preencha a descrição, o valor e a data corretamente.");
+  if (!descricao || valor <= 0 || !data) {
+    alert("Preencha os campos corretamente.");
     return;
   }
 
   const distribuicao = distribuirEntrada(valor);
 
-  dados.saldos.futuro = deCentavos(centavos(dados.saldos.futuro) + centavos(distribuicao.futuro));
-  dados.saldos.reserva = deCentavos(centavos(dados.saldos.reserva) + centavos(distribuicao.reserva));
-  dados.saldos.hobbies = deCentavos(centavos(dados.saldos.hobbies) + centavos(distribuicao.hobbies));
+  dados.saldos.futuro += distribuicao.futuro;
+  dados.saldos.reserva += distribuicao.reserva;
+  dados.saldos.hobbies += distribuicao.hobbies;
 
-  dados.entradas.push({
-    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
+  dados.entradas.unshift({
+    id: gerarId(),
     descricao,
-    valor: deCentavos(centavos(valor)),
+    valor,
     data,
-    criadoEm: new Date().toISOString(),
     distribuicao
   });
 
-  salvarDados();
-  evento.target.reset();
+  salvar();
+  e.target.reset();
   document.getElementById("entradaData").value = dataHoje();
-  renderizarTudo();
+
+  renderizar();
 
   alert(
     "Entrada registrada!\n\n" +
-    "Futuro: " + dinheiro(distribuicao.futuro) + "\n" +
-    "Reserva: " + dinheiro(distribuicao.reserva) + "\n" +
-    "Hobbies: " + dinheiro(distribuicao.hobbies)
+    "Futuro: " + reais(distribuicao.futuro) + "\n" +
+    "Reserva: " + reais(distribuicao.reserva) + "\n" +
+    "Hobbies: " + reais(distribuicao.hobbies)
   );
 });
 
-document.getElementById("formSaida").addEventListener("submit", evento => {
-  evento.preventDefault();
+function excluirEntrada(id) {
+  const entrada = dados.entradas.find(x => x.id === id);
+  if (!entrada) return;
+
+  if (!confirm("Excluir esta entrada? Os valores distribuídos serão retirados dos caixas.")) {
+    return;
+  }
+
+  const d = entrada.distribuicao || {
+    futuro: entrada.valor,
+    reserva: 0,
+    hobbies: 0
+  };
+
+  dados.saldos.futuro -= d.futuro || 0;
+  dados.saldos.reserva -= d.reserva || 0;
+  dados.saldos.hobbies -= d.hobbies || 0;
+
+  dados.entradas = dados.entradas.filter(x => x.id !== id);
+
+  salvar();
+  renderizar();
+}
+
+document.getElementById("formSaida").addEventListener("submit", e => {
+  e.preventDefault();
 
   const descricao = document.getElementById("saidaDescricao").value.trim();
   const valor = valorInput("saidaValor");
   const caixa = document.getElementById("saidaCaixa").value;
   const data = document.getElementById("saidaData").value;
 
-  if (!descricao || !Number.isFinite(valor) || valor <= 0 || !data) {
-    alert("Preencha a descrição, o valor e a data corretamente.");
+  if (!descricao || valor <= 0 || !data) {
+    alert("Preencha os campos corretamente.");
     return;
   }
 
-  const valorCentavos = centavos(valor);
-  const saldoCentavos = centavos(dados.saldos[caixa]);
-
-  if (valorCentavos > saldoCentavos) {
-    alert(`Saldo insuficiente em ${nomeCaixa(caixa)}.\nDisponível: ${dinheiro(dados.saldos[caixa])}`);
+  if (!["futuro", "reserva", "hobbies"].includes(caixa)) {
+    alert("Selecione um caixa válido.");
     return;
   }
 
-  dados.saldos[caixa] = deCentavos(saldoCentavos - valorCentavos);
-  dados.saidas.push({
-    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
+  if (valor > dados.saldos[caixa]) {
+    alert(
+      "Saldo insuficiente no caixa selecionado.\nSaldo disponível: " +
+      reais(dados.saldos[caixa])
+    );
+    return;
+  }
+
+  dados.saldos[caixa] -= valor;
+
+  dados.saidas.unshift({
+    id: gerarId(),
     descricao,
-    valor: deCentavos(valorCentavos),
+    valor,
     caixa,
-    data,
-    criadoEm: new Date().toISOString()
+    data
   });
 
-  salvarDados();
-  evento.target.reset();
+  salvar();
+  e.target.reset();
   document.getElementById("saidaData").value = dataHoje();
-  document.getElementById("saidaCaixa").value = "hobbies";
-  renderizarTudo();
-  alert("Saída registrada.");
+
+  renderizar();
+  alert("Saída registrada com sucesso.");
 });
 
-function prioridadeNumero(prioridade) {
-  return { "Alta": 1, "Média": 2, "Baixa": 3 }[prioridade] || 4;
-}
+function excluirSaida(id) {
+  const saida = dados.saidas.find(x => x.id === id);
+  if (!saida) return;
 
-function renderizarMetas() {
-  const metas = [...dados.metas].sort((a, b) => {
-    const diferenca = prioridadeNumero(a.prioridade) - prioridadeNumero(b.prioridade);
-    if (diferenca !== 0) return diferenca;
-    return String(a.prazo || "9999-99-99").localeCompare(String(b.prazo || "9999-99-99"));
-  });
-
-  const custoTotal = metas.reduce((soma, meta) => soma + Number(meta.custo || 0), 0);
-  const reservadoTotal = metas.reduce((soma, meta) => soma + Number(meta.guardado || 0), 0);
-  const faltaTotal = metas.reduce((soma, meta) => soma + Math.max(0, meta.custo - meta.guardado), 0);
-
-  document.getElementById("resumoPlanejamento").innerHTML = `
-    <div class="box-line"><span>Quantidade de metas</span><strong>${metas.length}</strong></div>
-    <div class="box-line"><span>Custo estimado total</span><strong>${dinheiro(custoTotal)}</strong></div>
-    <div class="box-line"><span>Valor já reservado nas metas</span><strong>${dinheiro(reservadoTotal)}</strong></div>
-    <div class="box-line"><span>Falta juntar</span><strong class="orange">${dinheiro(faltaTotal)}</strong></div>
-  `;
-
-  document.getElementById("listaMetas").innerHTML = metas.length
-    ? metas.map(meta => {
-      const custo = Number(meta.custo);
-      const guardado = Number(meta.guardado);
-      const percentual = custo > 0 ? Math.min(100, guardado / custo * 100) : 0;
-      const falta = Math.max(0, custo - guardado);
-      const completa = falta <= 0;
-
-      return `
-        <div class="card goal-card">
-          <div class="box-line">
-            <div>
-              <h3>${escapar(meta.nome)}</h3>
-              <div class="goal-meta">
-                <span class="tag">${escapar(meta.categoria)}</span>
-                <span class="tag">Prioridade ${escapar(meta.prioridade)}</span>
-                <span class="tag">${meta.prazo ? "Prazo: " + dataBonita(meta.prazo) : "Sem prazo"}</span>
-              </div>
-            </div>
-            <button class="danger" onclick="excluirMeta('${meta.id}')">Excluir</button>
-          </div>
-          <div class="grid">
-            <div><div class="card-label">Custo estimado</div><strong>${dinheiro(custo)}</strong></div>
-            <div><div class="card-label">Já reservado</div><strong>${dinheiro(guardado)}</strong></div>
-            <div><div class="card-label">Falta juntar</div><strong class="${completa ? "green" : "orange"}">${dinheiro(falta)}</strong></div>
-          </div>
-          <div class="progress"><div style="width:${percentual}%"></div></div>
-          <div class="small muted">${percentual.toFixed(1).replace(".", ",")}% planejado</div>
-          ${meta.notas ? `<p>${escapar(meta.notas)}</p>` : ""}
-          <hr>
-          <form onsubmit="atualizarValorMeta(event, '${meta.id}')">
-            <div class="field">
-              <label for="guardado-${meta.id}">Atualizar valor reservado (R$)</label>
-              <input id="guardado-${meta.id}" type="number" min="0" step="0.01" value="${guardado.toFixed(2)}" required>
-            </div>
-            <button class="secondary" type="submit">Atualizar planejamento</button>
-          </form>
-        </div>
-      `;
-    }).join("")
-    : '<div class="card"><p class="empty">Você ainda não cadastrou nenhuma meta.</p></div>';
-}
-
-document.getElementById("formMeta").addEventListener("submit", evento => {
-  evento.preventDefault();
-
-  const nome = document.getElementById("metaNome").value.trim();
-  const categoria = document.getElementById("metaCategoria").value;
-  const custo = valorInput("metaCusto");
-  const guardado = valorInput("metaGuardado");
-  const prioridade = document.getElementById("metaPrioridade").value;
-  const prazo = document.getElementById("metaPrazo").value;
-  const notas = document.getElementById("metaNotas").value.trim();
-
-  if (!nome || !Number.isFinite(custo) || custo <= 0 ||
-      !Number.isFinite(guardado) || guardado < 0) {
-    alert("Confira o nome e os valores da meta.");
+  if (!confirm("Excluir esta saída? O dinheiro será devolvido ao caixa.")) {
     return;
   }
 
-  dados.metas.push({
-    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
-    nome,
-    categoria,
-    custo: deCentavos(centavos(custo)),
-    guardado: deCentavos(centavos(guardado)),
-    prioridade,
-    prazo,
-    notas,
-    criadoEm: new Date().toISOString()
-  });
+  dados.saldos[saida.caixa] += saida.valor;
+  dados.saidas = dados.saidas.filter(x => x.id !== id);
 
-  salvarDados();
-  evento.target.reset();
-  document.getElementById("metaGuardado").value = "0";
-  document.getElementById("metaPrioridade").value = "Média";
-  renderizarTudo();
-  alert("Meta adicionada. Ela não altera os saldos das caixas.");
-});
+  salvar();
+  renderizar();
+}
 
-function atualizarValorMeta(evento, id) {
-  evento.preventDefault();
-  const meta = dados.metas.find(item => item.id === id);
-  const campo = document.getElementById("guardado-" + id);
-  if (!meta || !campo) return;
+document.getElementById("formMeta").addEventListener("submit", e => {
+  e.preventDefault();
 
-  const valor = Number(campo.value);
-  if (!Number.isFinite(valor) || valor < 0) {
-    alert("Informe um valor válido.");
+  const meta = {
+    id: gerarId(),
+    nome: document.getElementById("metaNome").value.trim(),
+    tipo: document.getElementById("metaTipo").value,
+    custo: valorInput("metaCusto"),
+    reservado: valorInput("metaReservado"),
+    prioridade: document.getElementById("metaPrioridade").value,
+    prazo: document.getElementById("metaPrazo").value,
+    notas: document.getElementById("metaNotas").value.trim()
+  };
+
+  if (!meta.nome || meta.custo < 0 || meta.reservado < 0) {
+    alert("Confira os dados da meta.");
     return;
   }
 
-  meta.guardado = deCentavos(centavos(valor));
-  salvarDados();
-  renderizarTudo();
+  dados.metas.push(meta);
+  salvar();
+  e.target.reset();
+  document.getElementById("metaReservado").value = "0";
+
+  renderizar();
+  alert("Meta adicionada.");
+});
+
+function atualizarReservado(id) {
+  const campo = document.getElementById("reservado-" + id);
+  if (!campo) return;
+
+  const valor = paraCentavos(campo.value);
+  if (valor < 0) {
+    alert("O valor não pode ser negativo.");
+    return;
+  }
+
+  const meta = dados.metas.find(x => x.id === id);
+  if (!meta) return;
+
+  meta.reservado = valor;
+  salvar();
+  renderizar();
 }
 
 function excluirMeta(id) {
-  if (!confirm("Excluir esta meta do planejamento? Isso não altera os saldos das caixas.")) return;
-  dados.metas = dados.metas.filter(meta => meta.id !== id);
-  salvarDados();
-  renderizarTudo();
+  if (!confirm("Excluir esta meta?")) return;
+  dados.metas = dados.metas.filter(x => x.id !== id);
+  salvar();
+  renderizar();
 }
 
-function preencherConfiguracoes() {
-  const cfg = dados.configuracoes;
-  document.getElementById("pFuturo").value = cfg.pFuturo;
-  document.getElementById("pReserva").value = cfg.pReserva;
-  document.getElementById("pHobbies").value = cfg.pHobbies;
-  document.getElementById("pFuturoDepois").value = cfg.pFuturoDepois;
-  document.getElementById("pHobbiesDepois").value = cfg.pHobbiesDepois;
-  document.getElementById("limiteReserva").value = cfg.limiteReserva;
-}
+document.getElementById("formPercentuais").addEventListener("submit", e => {
+  e.preventDefault();
 
-document.getElementById("formConfiguracoes").addEventListener("submit", evento => {
-  evento.preventDefault();
-
-  const cfg = {
-    pFuturo: valorInput("pFuturo"),
-    pReserva: valorInput("pReserva"),
-    pHobbies: valorInput("pHobbies"),
-    pFuturoDepois: valorInput("pFuturoDepois"),
-    pHobbiesDepois: valorInput("pHobbiesDepois"),
-    limiteReserva: valorInput("limiteReserva")
+  const antes = {
+    futuro: Number(document.getElementById("pctFuturoAntes").value),
+    reserva: Number(document.getElementById("pctReservaAntes").value),
+    hobbies: Number(document.getElementById("pctHobbiesAntes").value)
   };
 
-  const valores = Object.values(cfg);
-  if (valores.some(valor => !Number.isFinite(valor) || valor < 0)) {
-    alert("Use apenas valores válidos e não negativos.");
+  const depois = {
+    futuro: Number(document.getElementById("pctFuturoDepois").value),
+    hobbies: Number(document.getElementById("pctHobbiesDepois").value)
+  };
+
+  const valores = [...Object.values(antes), ...Object.values(depois)];
+
+  if (valores.some(x => !Number.isFinite(x) || x < 0 || x > 100)) {
+    alert("Use percentuais entre 0 e 100.");
     return;
   }
 
-  const somaNormal = cfg.pFuturo + cfg.pReserva + cfg.pHobbies;
-  const somaDepois = cfg.pFuturoDepois + cfg.pHobbiesDepois;
-
-  if (Math.abs(somaNormal - 100) > 0.001) {
-    alert(`A divisão normal precisa somar 100%. A soma atual é ${formatarPorcentagem(somaNormal)}.`);
+  if (antes.futuro + antes.reserva + antes.hobbies !== 100) {
+    alert("Os percentuais da primeira fase precisam somar exatamente 100%.");
     return;
   }
 
-  if (Math.abs(somaDepois - 100) > 0.001) {
-    alert(`A divisão pós-reserva precisa somar 100%. A soma atual é ${formatarPorcentagem(somaDepois)}.`);
+  if (depois.futuro + depois.hobbies !== 100) {
+    alert("Os percentuais da segunda fase precisam somar exatamente 100%.");
     return;
   }
 
-  dados.configuracoes = cfg;
-  salvarDados();
-  renderizarTudo();
-  alert("Configurações salvas.");
+  dados.percentuais = { antes, depois };
+  salvar();
+  alert("Percentuais salvos com sucesso.");
+  renderizar();
 });
 
-document.getElementById("formSaldoInicial").addEventListener("submit", evento => {
-  evento.preventDefault();
+document.getElementById("formLimites").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const reserva = valorInput("limiteReserva");
+  const hobbies = valorInput("limiteHobbies");
+
+  if (reserva < 0 || hobbies < 0) {
+    alert("Os limites não podem ser negativos.");
+    return;
+  }
+
+  dados.limites.reserva = reserva;
+  dados.limites.hobbies = hobbies;
+
+  salvar();
+  renderizar();
+  alert("Limites atualizados.");
+});
+
+document.getElementById("formSaldos").addEventListener("submit", e => {
+  e.preventDefault();
 
   const futuro = valorInput("inicialFuturo");
   const reserva = valorInput("inicialReserva");
   const hobbies = valorInput("inicialHobbies");
 
-  if ([futuro, reserva, hobbies].some(valor => !Number.isFinite(valor) || valor < 0)) {
-    alert("Informe saldos válidos e não negativos.");
+  if ([futuro, reserva, hobbies].some(x => x < 0)) {
+    alert("Os saldos não podem ser negativos.");
     return;
   }
 
-  if (!confirm("Isso substituirá os saldos atuais e apagará o histórico de entradas e saídas. As metas e configurações serão mantidas. Deseja continuar?")) {
+  if (!confirm("Isso substituirá os saldos atuais e apagará os históricos de entradas e saídas. Deseja continuar?")) {
     return;
   }
 
-  dados.saldos = {
-    futuro: deCentavos(centavos(futuro)),
-    reserva: deCentavos(centavos(reserva)),
-    hobbies: deCentavos(centavos(hobbies))
-  };
+  dados.saldos = { futuro, reserva, hobbies };
   dados.entradas = [];
   dados.saidas = [];
 
-  salvarDados();
-  renderizarTudo();
-  alert("Saldos iniciais definidos.");
+  salvar();
+  renderizar();
+  alert("Saldos atualizados. Metas e configurações foram mantidas.");
 });
 
-document.getElementById("exportarBackup").addEventListener("click", () => {
+function preencherConfiguracoes() {
+  document.getElementById("pctFuturoAntes").value = dados.percentuais.antes.futuro;
+  document.getElementById("pctReservaAntes").value = dados.percentuais.antes.reserva;
+  document.getElementById("pctHobbiesAntes").value = dados.percentuais.antes.hobbies;
+
+  document.getElementById("pctFuturoDepois").value = dados.percentuais.depois.futuro;
+  document.getElementById("pctHobbiesDepois").value = dados.percentuais.depois.hobbies;
+
+  document.getElementById("limiteReserva").value = (dados.limites.reserva / 100).toFixed(2);
+  document.getElementById("limiteHobbies").value = (dados.limites.hobbies / 100).toFixed(2);
+
+  document.getElementById("inicialFuturo").value = (dados.saldos.futuro / 100).toFixed(2);
+  document.getElementById("inicialReserva").value = (dados.saldos.reserva / 100).toFixed(2);
+  document.getElementById("inicialHobbies").value = (dados.saldos.hobbies / 100).toFixed(2);
+}
+
+function exportarBackup() {
   const conteudo = JSON.stringify(dados, null, 2);
-  const arquivo = new Blob([conteudo], { type: "application/json" });
-  const url = URL.createObjectURL(arquivo);
-  const link = document.createElement("a");
+  const blob = new Blob([conteudo], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
 
-  link.href = url;
-  link.download = `backup-financeiro-${dataHoje()}.json`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup-controle-financeiro.json";
+  a.click();
+
   URL.revokeObjectURL(url);
-});
+}
 
-document.getElementById("escolherImportacao").addEventListener("click", () => {
-  document.getElementById("arquivoImportacao").click();
-});
-
-document.getElementById("arquivoImportacao").addEventListener("change", async evento => {
-  const arquivo = evento.target.files[0];
+function importarBackup(event) {
+  const arquivo = event.target.files[0];
   if (!arquivo) return;
 
-  try {
-    const texto = await arquivo.text();
-    const importado = JSON.parse(texto);
+  const leitor = new FileReader();
 
-    const valido =
-      importado &&
-      typeof importado === "object" &&
-      importado.configuracoes &&
-      importado.saldos &&
-      Array.isArray(importado.entradas) &&
-      Array.isArray(importado.saidas) &&
-      Array.isArray(importado.metas);
+  leitor.onload = () => {
+    try {
+      const importado = JSON.parse(leitor.result);
 
-    if (!valido) {
-      throw new Error("Formato de backup inválido.");
+      if (!importado || typeof importado !== "object" ||
+          !importado.saldos || !importado.percentuais) {
+        throw new Error("Formato inválido");
+      }
+
+      if (!confirm("Importar este backup substituirá todos os dados atuais. Continuar?")) {
+        event.target.value = "";
+        return;
+      }
+
+      const base = clonar(PADRAO);
+
+      dados = {
+        ...base,
+        ...importado,
+        saldos: { ...base.saldos, ...importado.saldos },
+        limites: { ...base.limites, ...(importado.limites || {}) },
+        percentuais: {
+          antes: {
+            ...base.percentuais.antes,
+            ...(importado.percentuais.antes || {})
+          },
+          depois: {
+            ...base.percentuais.depois,
+            ...(importado.percentuais.depois || {})
+          }
+        },
+        entradas: Array.isArray(importado.entradas) ? importado.entradas : [],
+        saidas: Array.isArray(importado.saidas) ? importado.saidas : [],
+        metas: Array.isArray(importado.metas) ? importado.metas : []
+      };
+
+      salvar();
+      preencherConfiguracoes();
+      renderizar();
+      alert("Backup importado com sucesso.");
+    } catch (erro) {
+      alert("Não foi possível importar. Verifique se o arquivo é um backup válido.");
     }
 
-    const caixasValidas = ["futuro", "reserva", "hobbies"].every(caixa =>
-      Number.isFinite(Number(importado.saldos[caixa])) && Number(importado.saldos[caixa]) >= 0
-    );
+    event.target.value = "";
+  };
 
-    if (!caixasValidas) {
-      throw new Error("Os saldos do arquivo são inválidos.");
-    }
+  leitor.readAsText(arquivo);
+}
 
-    if (!confirm("Importar este backup substituirá todos os dados atuais. Deseja continuar?")) {
-      evento.target.value = "";
-      return;
-    }
-
-    const cfg = { ...CONFIG_PADRAO, ...importado.configuracoes };
-    const somaNormal = Number(cfg.pFuturo) + Number(cfg.pReserva) + Number(cfg.pHobbies);
-    const somaDepois = Number(cfg.pFuturoDepois) + Number(cfg.pHobbiesDepois);
-
-    if (
-      !Object.values(cfg).every(valor => Number.isFinite(Number(valor)) && Number(valor) >= 0) ||
-      Math.abs(somaNormal - 100) > 0.001 ||
-      Math.abs(somaDepois - 100) > 0.001
-    ) {
-      throw new Error("As configurações do backup são inválidas.");
-    }
-
-    dados = {
-      versao: 1,
-      configuracoes: cfg,
-      saldos: {
-        futuro: deCentavos(centavos(importado.saldos.futuro)),
-        reserva: deCentavos(centavos(importado.saldos.reserva)),
-        hobbies: deCentavos(centavos(importado.saldos.hobbies))
-      },
-      entradas: importado.entradas,
-      saidas: importado.saidas,
-      metas: importado.metas
-    };
-
-    salvarDados();
-    renderizarTudo();
-    alert("Backup importado com sucesso.");
-  } catch (erro) {
-    alert("Não foi possível importar o backup: " + erro.message);
+function limparTudo() {
+  if (!confirm("Tem certeza? Todos os saldos, históricos, metas e configurações serão apagados.")) {
+    return;
   }
 
-  evento.target.value = "";
-});
+  if (!confirm("Última confirmação: deseja realmente apagar tudo?")) {
+    return;
+  }
 
-document.getElementById("apagarDados").addEventListener("click", () => {
-  const confirmacao = prompt('Para apagar todos os dados deste navegador, digite APAGAR');
-  if (confirmacao !== "APAGAR") return;
+  dados = clonar(PADRAO);
+  salvar();
+  preencherConfiguracoes();
+  renderizar();
 
-  dados = estadoInicial();
-  salvarDados();
-  renderizarTudo();
-  alert("Os dados locais foram apagados.");
-});
+  alert("Todos os dados foram apagados.");
+}
 
-// Datas padrão nos formulários.
+function renderizarHistoricoEntradas() {
+  const el = document.getElementById("historicoEntradas");
+
+  if (!dados.entradas.length) {
+    el.innerHTML = '<div class="empty">Nenhuma entrada registrada.</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Descrição</th><th>Data</th><th>Valor</th><th>Distribuição</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${dados.entradas.map(x => {
+          const d = x.distribuicao || { futuro:x.valor, reserva:0, hobbies:0 };
+          return `
+            <tr>
+              <td><div class="transaction-title">${escapar(x.descricao)}</div></td>
+              <td>${formatarData(x.data)}</td>
+              <td class="green">${reais(x.valor)}</td>
+              <td class="small">
+                Futuro ${reais(d.futuro || 0)}<br>
+                Reserva ${reais(d.reserva || 0)}<br>
+                Hobbies ${reais(d.hobbies || 0)}
+              </td>
+              <td><button class="danger" onclick="excluirEntrada('${x.id}')">Excluir</button></td>
+            </tr>
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderizarHistoricoSaidas() {
+  const el = document.getElementById("historicoSaidas");
+
+  if (!dados.saidas.length) {
+    el.innerHTML = '<div class="empty">Nenhuma saída registrada.</div>';
+    return;
+  }
+
+  const nomes = {
+    futuro:"Futuro",
+    reserva:"Reserva",
+    hobbies:"Hobbies"
+  };
+
+  el.innerHTML = `
+    <table>
+      <thead>
+        <tr><th>Descrição</th><th>Caixa</th><th>Data</th><th>Valor</th><th></th></tr>
+      </thead>
+      <tbody>
+        ${dados.saidas.map(x => `
+          <tr>
+            <td>${escapar(x.descricao)}</td>
+            <td>${nomes[x.caixa] || escapar(x.caixa)}</td>
+            <td>${formatarData(x.data)}</td>
+            <td class="orange">${reais(x.valor)}</td>
+            <td><button class="danger" onclick="excluirSaida('${x.id}')">Excluir</button></td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderizarMetas() {
+  const el = document.getElementById("listaMetas");
+
+  if (!dados.metas.length) {
+    el.innerHTML = '<div class="empty">Você ainda não cadastrou metas.</div>';
+    return;
+  }
+
+  const prioridades = {
+    alta:"Alta",
+    media:"Média",
+    baixa:"Baixa"
+  };
+
+  el.innerHTML = dados.metas.map(meta => {
+    const custo = Math.max(0, meta.custo || 0);
+    const reservado = Math.max(0, meta.reservado || 0);
+    const progresso = porcentagem(reservado, custo);
+    const restante = Math.max(0, custo - reservado);
+
+    return `
+      <div class="goal">
+        <div class="goal-top">
+          <div>
+            <div class="goal-name">${escapar(meta.nome)}</div>
+            <div class="goal-details">
+              <span class="tag ${meta.tipo === "importante" ? "blue" : "orange"}">
+                ${meta.tipo === "importante" ? "Importante" : "Hobby"}
+              </span>
+              <span class="tag">Prioridade ${prioridades[meta.prioridade] || "Média"}</span>
+              ${meta.prazo ? `<span class="tag">${formatarData(meta.prazo)}</span>` : ""}
+            </div>
+          </div>
+          <button class="danger" onclick="excluirMeta('${meta.id}')">Excluir</button>
+        </div>
+
+        <div class="bar">
+          <div class="bar-purple" style="width:${progresso}%"></div>
+        </div>
+
+        <div class="small">
+          ${reais(reservado)} reservados de ${reais(custo)}
+          · Faltam ${reais(restante)}
+        </div>
+
+        <div class="form-grid" style="margin-top:12px;max-width:450px">
+          <div>
+            <label for="reservado-${meta.id}">Valor reservado (R$)</label>
+            <input id="reservado-${meta.id}" type="number" min="0" step="0.01"
+              value="${(reservado / 100).toFixed(2)}">
+          </div>
+          <div style="display:flex;align-items:end">
+            <button class="secondary" onclick="atualizarReservado('${meta.id}')">Atualizar valor</button>
+          </div>
+        </div>
+
+        ${meta.notas ? `<div class="goal-details">${escapar(meta.notas)}</div>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
+function renderizarPainel() {
+  const s = dados.saldos;
+  const patrimonio = totalPatrimonio();
+
+  document.getElementById("patrimonioTotal").textContent = reais(patrimonio);
+  document.getElementById("saldoFuturo").textContent = reais(s.futuro);
+  document.getElementById("saldoReserva").textContent = reais(s.reserva);
+  document.getElementById("saldoHobbies").textContent = reais(s.hobbies);
+
+  const totalEntradas = dados.entradas.reduce((a, x) => a + (x.valor || 0), 0);
+  const totalSaidas = dados.saidas.reduce((a, x) => a + (x.valor || 0), 0);
+
+  document.getElementById("totalEntradas").textContent = reais(totalEntradas);
+  document.getElementById("totalSaidas").textContent = reais(totalSaidas);
+
+  const limiteR = Math.max(0, dados.limites.reserva);
+  const limiteH = Math.max(0, dados.limites.hobbies);
+
+  const progressoR = porcentagem(s.reserva, limiteR);
+  const progressoH = porcentagem(s.hobbies, limiteH);
+
+  document.getElementById("barraReserva").style.width = progressoR + "%";
+  document.getElementById("barraHobbies").style.width = progressoH + "%";
+
+  document.getElementById("progressoReserva").textContent =
+    `${reais(s.reserva)} de ${reais(limiteR)}`;
+
+  document.getElementById("progressoHobbies").textContent =
+    `${reais(s.hobbies)} de ${reais(limiteH)}`;
+
+  const caixas = [
+    { nome:"Futuro", valor:s.futuro, classe:"blue", cor:"bar-blue" },
+    { nome:"Reserva", valor:s.reserva, classe:"green", cor:"bar-green" },
+    { nome:"Hobbies", valor:s.hobbies, classe:"orange", cor:"bar-orange" }
+  ];
+
+  document.getElementById("distribuicao").innerHTML = caixas.map(c => `
+    <div style="margin-bottom:15px">
+      <div class="goal-top">
+        <span>${c.nome}</span>
+        <strong class="${c.classe}">${reais(c.valor)}</strong>
+      </div>
+      <div class="bar">
+        <div class="${c.cor}" style="width:${porcentagem(c.valor, patrimonio)}%"></div>
+      </div>
+      <div class="small">${porcentagem(c.valor, patrimonio).toFixed(1)}% do patrimônio</div>
+    </div>
+  `).join("");
+
+  const metasOrdenadas = [...dados.metas].sort((a, b) => {
+    const ordem = { alta:0, media:1, baixa:2 };
+    return (ordem[a.prioridade] ?? 1) - (ordem[b.prioridade] ?? 1);
+  });
+
+  const proximas = metasOrdenadas.slice(0, 4);
+
+  document.getElementById("metasPainel").innerHTML = proximas.length
+    ? proximas.map(m => `
+        <div class="goal">
+          <div class="goal-name">${escapar(m.nome)}</div>
+          <div class="goal-details">
+            ${reais(m.reservado || 0)} de ${reais(m.custo || 0)}
+          </div>
+        </div>
+      `).join("")
+    : '<div class="empty">Nenhuma meta cadastrada.</div>';
+
+  const movimentacoes = [
+    ...dados.entradas.map(x => ({...x, tipo:"Entrada"})),
+    ...dados.saidas.map(x => ({...x, tipo:"Saída"}))
+  ].sort((a, b) => {
+    const da = a.data || "";
+    const db = b.data || "";
+    return db.localeCompare(da);
+  }).slice(0, 6);
+
+  document.getElementById("movimentacoesRecentes").innerHTML =
+    movimentacoes.length
+      ? `
+        <table>
+          <thead><tr><th>Movimentação</th><th>Tipo</th><th>Data</th><th>Valor</th></tr></thead>
+          <tbody>
+            ${movimentacoes.map(x => `
+              <tr>
+                <td>${escapar(x.descricao)}</td>
+                <td><span class="tag ${x.tipo === "Entrada" ? "green" : "orange"}">${x.tipo}</span></td>
+                <td>${formatarData(x.data)}</td>
+                <td class="${x.tipo === "Entrada" ? "green" : "orange"}">
+                  ${x.tipo === "Entrada" ? "+" : "-"} ${reais(x.valor)}
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `
+      : '<div class="empty">Suas movimentações aparecerão aqui.</div>';
+}
+
+function renderizar() {
+  renderizarPainel();
+  renderizarHistoricoEntradas();
+  renderizarHistoricoSaidas();
+  renderizarMetas();
+}
+
 document.getElementById("entradaData").value = dataHoje();
 document.getElementById("saidaData").value = dataHoje();
+document.getElementById("dataAtual").textContent =
+  new Date().toLocaleDateString("pt-BR", {
+    weekday:"long",
+    day:"2-digit",
+    month:"long",
+    year:"numeric"
+  });
 
-renderizarTudo();
+preencherConfiguracoes();
+salvar();
+renderizar();
 </script>
 </body>
 </html>
